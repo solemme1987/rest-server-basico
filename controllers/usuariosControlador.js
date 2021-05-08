@@ -1,22 +1,32 @@
-const { response } = require('express');
+const { response, request } = require('express');
 
-const usuariosGet = (req, res = response) => {
+const usuariosGet = (req = request, res = response) => {
+
+    const { q, nombre = "No Name", apikey } = req.query;
     res.json({
-        msg: "GET API - CONTROLADOR"
+        msg: "GET API - CONTROLADOR",
+        q,
+        nombre,
+        apikey
     });
 };
 
 // POS PARA EL USUARIO EN LA API
 const usuariosPost = (req, res = response) => {
+    const { nombre, telefono } = req.body;
     res.json({
-        msg: "POST API - CONTROLADOR"
+        msg: "POST API - CONTROLADOR",
+        nombre,
+        telefono
     });
 };
 
 // PUT PARA EL USUARIO EN LA API
 const usuariosPut = (req, res = response) => {
+    const id = req.params.id;
     res.json({
-        msg: "PUT API - CONTROLADOR"
+        msg: "PUT API - CONTROLADOR",
+        id
     });
 };
 

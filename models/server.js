@@ -18,9 +18,15 @@ class Server {
     }
 
     midlewares() {
+
         //CORS
         this.app.use(cors());
-        //Establezco com ruta raiz el directorio público
+
+        // LEctura y parseo del Body
+        //Esto hace que todo lo que ingrse al servidor por http
+        // intene parszearlo o convertirlo a formato json
+        this.app.use(express.json());
+        //Establece com ruta raiz el directorio público y vbusca el inex.html como primera opcion arenderizar
         this.app.use(express.static('public'));
     }
 

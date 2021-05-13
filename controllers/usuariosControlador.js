@@ -1,4 +1,12 @@
 const { response, request } = require('express');
+const bcryptjs = require('bcryptjs');
+
+/*Importamos el modelo para poder hacer el insert en nuestra coleccion
+Es necsario mas no obligacion que coloquemos la importacion de sta constante
+en mayuscula inicial para que javascript nos permita hacer instancias del modelo
+como si fuerauna clase, el estandar */
+const UsuariosModelo = require('../models/usuariosModelo');
+
 
 const usuariosGet = (req = request, res = response) => {
 
@@ -11,22 +19,43 @@ const usuariosGet = (req = request, res = response) => {
     });
 };
 
-// POS PARA EL USUARIO EN LA API
-const usuariosPost = (req, res = response) => {
-    const { nombre, telefono } = req.body;
+// REGISTRA EL USUARIO EN LA API
+const usuariosPost = async(req, res = response) => {
+
+    // /$#Mostramos los errores si el emeail ingresado no es correcto
+
+    const { nombre, correo, password, rol } = req.body;
+
+    const usuario = new UsuariosModelo({ nombre, correo, password, rol });
+
+    //VERIFICAR SI EL CORREO EXISTE
+    //Encriptar la  contraseña
+    const salt = bcryptjs.genSaltSync();
+    usuario.password = bcryptjs.hashSync(password, salt);
+
+    //Guardar en la db
+    await usuario.save();
+
     res.json({
-        msg: "POST API - CONTROLADOR",
-        nombre,
-        telefono
+        usuario
     });
 };
 
-// PUT PARA EL USUARIO EN LA API
-const usuariosPut = (req, res = response) => {
-    const id = req.params.id;
+// ACTUALIZAR EL USARIO
+const usuariosPut = async(req, res = response) => {
+
+    const { id } = req.params;
+    const { _id, password, google, correo, ...resto } = req.body;
+
+    if (password) {
+        //Encriptar la  contraseña
+        const salt = bcryptjs.genSaltSync();
+        resto.password = bcryptjs.hashSync(password, salt);
+    }
+    const usuario = await UsuariosModelo.findByIdAndUpdate(id, resto);
     res.json({
         msg: "PUT API - CONTROLADOR",
-        id
+        usuario
     });
 };
 

@@ -1,6 +1,7 @@
 const express = require('express');
 
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
 
 class Server {
 
@@ -10,8 +11,12 @@ class Server {
         this.port = process.env.PORT;
         this.usuariosPath = '/api/usuarios';
 
+        // CONNECTAR LA BASE DE DATOS
+        this.connectDb();
+
         // MIDLEWARES
         this.midlewares();
+
 
         // RUTAS DE MI APP
         this.routes();
@@ -28,6 +33,10 @@ class Server {
         this.app.use(express.json());
         //Establece com ruta raiz el directorio público y vbusca el inex.html como primera opcion arenderizar
         this.app.use(express.static('public'));
+    }
+
+    async connectDb() {
+        await dbConnection();
     }
 
     routes() {

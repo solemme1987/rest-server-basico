@@ -8,14 +8,23 @@ como si fuerauna clase, el estandar */
 const UsuariosModelo = require('../models/usuariosModelo');
 
 
-const usuariosGet = (req = request, res = response) => {
+// OBTENR USUARIOS DESDE UN REGISTRO ESPECIFICO ES
+const usuariosGet = async(req = request, res = response) => {
 
-    const { q, nombre = "No Name", apikey } = req.query;
+    const { desde = 0, limit = 5 } = req.query;
+    //que solo me muestre los  usuarios que tienen  es estado en true
+    const query = { estado: true };
+
+    const [total_usuarios, usuarios] = await Promise.all([
+        UsuariosModelo.countDocuments(query),
+        UsuariosModelo.find(query)
+        .skip(Number(desde))
+        .limit(Number(limit))
+    ]);
+
     res.json({
-        msg: "GET API - CONTROLADOR",
-        q,
-        nombre,
-        apikey
+        total_usuarios,
+        usuarios
     });
 };
 
@@ -60,9 +69,18 @@ const usuariosPut = async(req, res = response) => {
 };
 
 // DEÑETE ÁRA EL USUARIO EN LA API
-const usuariosDelete = (req, res = response) => {
+const usuariosDelete = async(req, res = response) => {
+
+    const { id } = req.params;
+    // BORRAMOS EL USUARIO FISICAMENTE FORMA NO RECOMENDADA
+    // const usuario = await UsuariosModelo.findByIdAndDelete(id);
+
+    // ELIMINAMOS EL USUARIO DE LA FORMA RECOMENDADA CAMBIANDO SU ESTADO A FALSE
+    const usuario = await UsuariosModelo.findByIdAndUpdate(id, { estado: false });
+
     res.json({
-        msg: "DELET API - CONTROLADOR"
+        msg: "USUARIO ELIMINADO CORRECTAMENTE",
+        usuario
     });
 };
 
